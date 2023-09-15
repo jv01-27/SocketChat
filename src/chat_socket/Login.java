@@ -27,11 +27,12 @@ package chat_socket;
              *
               *
                *
-                */
+ */
 import java.awt.Color;
 import javax.swing.JOptionPane;
 import java.io.*;
 import java.net.*;
+import javax.swing.ToolTipManager;
 
 public class Login extends javax.swing.JFrame {
 
@@ -58,6 +59,8 @@ public class Login extends javax.swing.JFrame {
         loginBtnTxt = new javax.swing.JLabel();
         portTxt = new javax.swing.JTextField();
         servidorCheckBox = new javax.swing.JCheckBox();
+        ipTxt = new javax.swing.JTextField();
+        ipLabel = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -75,7 +78,13 @@ public class Login extends javax.swing.JFrame {
         title.setText("INICIAR SESIÓN");
 
         userLabel.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
-        userLabel.setText("USUARIO (\"admin\")");
+        userLabel.setText("USUARIO (ManténElCursorAquí)");
+        userLabel.setToolTipText("server | cliente | admin");
+        userLabel.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                userLabelMouseClicked(evt);
+            }
+        });
 
         userTxt.setBackground(new java.awt.Color(250, 250, 250));
         userTxt.setFont(new java.awt.Font("Segoe UI", 0, 12)); // NOI18N
@@ -94,7 +103,13 @@ public class Login extends javax.swing.JFrame {
         });
 
         passLabel.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
-        passLabel.setText(" CONTRASEÑA (\"admin\")");
+        passLabel.setText(" CONTRASEÑA (ManténElCursorAquí)");
+        passLabel.setToolTipText("server | cliente | admin");
+        passLabel.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                passLabelMouseClicked(evt);
+            }
+        });
 
         passTxt.setBackground(new java.awt.Color(250, 250, 250));
         passTxt.setForeground(new java.awt.Color(204, 204, 204));
@@ -165,7 +180,32 @@ public class Login extends javax.swing.JFrame {
             }
         });
 
+        servidorCheckBox.setSelected(true);
         servidorCheckBox.setText("Soy Servidor");
+        servidorCheckBox.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                servidorCheckBoxMouseClicked(evt);
+            }
+        });
+
+        ipTxt.setBackground(new java.awt.Color(250, 250, 250));
+        ipTxt.setFont(new java.awt.Font("Segoe UI", 0, 12)); // NOI18N
+        ipTxt.setBorder(null);
+        ipTxt.setEnabled(false);
+        ipTxt.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mousePressed(java.awt.event.MouseEvent evt) {
+                ipTxtMousePressed(evt);
+            }
+        });
+        ipTxt.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                ipTxtKeyTyped(evt);
+            }
+        });
+
+        ipLabel.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        ipLabel.setText("IP Del servidor");
+        ipLabel.setEnabled(false);
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -183,14 +223,16 @@ public class Login extends javax.swing.JFrame {
                     .addComponent(portTxt, javax.swing.GroupLayout.PREFERRED_SIZE, 230, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(servidorCheckBox)
                     .addComponent(title)
-                    .addComponent(favicon))
+                    .addComponent(favicon)
+                    .addComponent(ipLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 230, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(ipTxt, javax.swing.GroupLayout.PREFERRED_SIZE, 230, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(20, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addComponent(favicon, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(title)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(userLabel)
@@ -200,13 +242,17 @@ public class Login extends javax.swing.JFrame {
                 .addComponent(passLabel)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(passTxt, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(11, 11, 11)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(portLabel)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(portTxt, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(servidorCheckBox)
-                .addGap(12, 12, 12)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(ipLabel)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(ipTxt, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 25, Short.MAX_VALUE)
                 .addComponent(loginBtn, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
@@ -225,7 +271,7 @@ public class Login extends javax.swing.JFrame {
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 374, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
         );
 
         pack();
@@ -242,12 +288,23 @@ public class Login extends javax.swing.JFrame {
     private void loginBtnTxtMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_loginBtnTxtMouseClicked
         // validacion de contraseña, wacha el nombre de los botones y objetos
         //String Cliente = "";//"empleado";//"hackerman";
-        String Usuario = "admin"; //"administrador";
-        String Contraseña = "admin"; //"administrador";///definicion de contraseña
+        String[] usuarios = {"server", "cliente", "admin"};
+        String[] contrasenas = {"server", "cliente", "admin"};
 
-        String Pass = new String(passTxt.getPassword()); //referencia, el metodo obtiene la contraseña del jpassword field        
+        String usuarioIngresado = userTxt.getText();
+        String contrasenaIngresada = new String(passTxt.getPassword());
 
-        if (userTxt.getText().equals(Usuario) && Pass.equals(Contraseña)) {
+        boolean credencialesCorrectas = false;
+
+        // Verificar las credenciales ingresadas con los datos almacenados
+        for (int i = 0; i < usuarios.length; i++) {
+            if (usuarios[i].equals(usuarioIngresado) && contrasenas[i].equals(contrasenaIngresada)) {
+                credencialesCorrectas = true;
+                break;
+            }
+        }
+
+        if (credencialesCorrectas) {
 
             /*
             En este código, el bloque try intenta crear un ServerSocket en el puerto deseado.
@@ -257,6 +314,7 @@ public class Login extends javax.swing.JFrame {
              */
             try {
                 String port = portTxt.getText();
+                String ipAdd = ipTxt.getText();
                 boolean serServidor = servidorCheckBox.isSelected();
 
                 int desiredPort = Integer.parseInt(port);
@@ -266,14 +324,16 @@ public class Login extends javax.swing.JFrame {
                     ServerSocket serverSocket = new ServerSocket(desiredPort);
                     System.out.println("ServerSocket creado");
 
-                    Chat chatS = new Chat(serverSocket, userTxt.getText());
+                    JOptionPane.showMessageDialog(this, "Esperando la conexión de un cliente", "Servidor", JOptionPane.INFORMATION_MESSAGE);
+
+                    Chat chatS = new Chat(serverSocket, usuarioIngresado);
                     chatS.setVisible(true);
                     System.out.println("Ventana de Chat abierta como servidor");
                     this.dispose();
                 } else {
                     System.out.println("Iniciando como cliente en el puerto " + desiredPort);
 
-                    Chat chat = new Chat(desiredPort, userTxt.getText());
+                    Chat chat = new Chat(desiredPort, ipAdd, usuarioIngresado);
                     chat.setVisible(true);
                     System.out.println("Ventana de Chat abierta como cliente");
                     this.dispose();
@@ -355,6 +415,39 @@ public class Login extends javax.swing.JFrame {
         correction.text_numberKeyPress(evt, userTxt);
     }//GEN-LAST:event_portTxtKeyTyped
 
+    private void servidorCheckBoxMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_servidorCheckBoxMouseClicked
+        boolean serServidor = servidorCheckBox.isSelected();
+        if (serServidor) {
+            ipLabel.setEnabled(false);
+            ipTxt.setEnabled(false);
+        } else {
+            ipLabel.setEnabled(true);
+            ipTxt.setEnabled(true);
+        }
+    }//GEN-LAST:event_servidorCheckBoxMouseClicked
+
+    private void ipTxtMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_ipTxtMousePressed
+
+    }//GEN-LAST:event_ipTxtMousePressed
+
+    private void ipTxtKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_ipTxtKeyTyped
+        correction.numberDecilmalKeyPress(evt, userTxt);
+    }//GEN-LAST:event_ipTxtKeyTyped
+
+    private void userLabelMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_userLabelMouseClicked
+        // Mostrar el tooltip al hacer clic
+        userLabel.setToolTipText("server | cliente | admin");
+        // Tiempo en milisegundos antes de ocultar el tooltip (en este caso, 2 segundos)
+        ToolTipManager.sharedInstance().setDismissDelay(5000); 
+    }//GEN-LAST:event_userLabelMouseClicked
+
+    private void passLabelMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_passLabelMouseClicked
+        // Mostrar el tooltip al hacer clic
+        passLabel.setToolTipText("server | cliente | admin");
+        // Tiempo en milisegundos antes de ocultar el tooltip (en este caso, 2 segundos)
+        ToolTipManager.sharedInstance().setDismissDelay(5000); 
+    }//GEN-LAST:event_passLabelMouseClicked
+
     /**
      * @param args the command line arguments
      */
@@ -390,6 +483,8 @@ public class Login extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel favicon;
+    private javax.swing.JLabel ipLabel;
+    private javax.swing.JTextField ipTxt;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel loginBtn;

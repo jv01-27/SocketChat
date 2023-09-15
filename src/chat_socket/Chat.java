@@ -56,25 +56,25 @@ public class Chat extends javax.swing.JFrame implements ChatDisconnectListener {
         }
 
         // Inicializa la variable de instancia chatPeer
-        chatPeer = new ChatPeer(socket, msj_area, user);
+        chatPeer = new ChatPeer(socket, msj_area, "cliente");
         chatPeer.setDisconnectListener(this); // "this" se refiere a la instancia de Chat que implementa el listener
         chatPeer.start(); // Iniciar el hilo de ChatPeer
         // Configura la lógica para trabajar con el socket (enviar y recibir mensajes, etc.)
     }
 
-    public Chat(int port, String user) {
+    public Chat(int port, String ip, String user) {
         initComponents();
 
         // Configurar la conexión saliente como cliente
         try {
-            socket = new Socket("localhost", port); // Conéctate al servidor en localhost
+            socket = new Socket(ip, port); // Conéctate al servidor en localhost
             kind.setText("Conectado como Cliente");
         } catch (IOException e) {
             System.out.println("Hubo un error al crear el socket: " + e);
         }
 
         // Inicializa la variable de instancia chatPeer
-        chatPeer = new ChatPeer(socket, msj_area, user);
+        chatPeer = new ChatPeer(socket, msj_area, "server");
         chatPeer.setDisconnectListener(this); // "this" se refiere a la instancia de Chat que implementa el listener
         chatPeer.start(); // Iniciar el hilo de ChatPeer
         // Configura la lógica para trabajar con el socket (enviar y recibir mensajes, etc.)
@@ -263,7 +263,7 @@ public class Chat extends javax.swing.JFrame implements ChatDisconnectListener {
     }//GEN-LAST:event_enviar_msjMouseReleased
 
     private void logoutMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_logoutMouseClicked
-        terCon();
+        System.exit(0);
     }//GEN-LAST:event_logoutMouseClicked
 
     private void exportConvMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_exportConvMouseClicked
@@ -345,9 +345,10 @@ public class Chat extends javax.swing.JFrame implements ChatDisconnectListener {
             }
         }
 
-        Login log = new Login();
-        log.setVisible(true);
-        this.dispose();
+        //Login log = new Login();
+        //log.setVisible(true);
+        System.exit(0);
+        //this.dispose();
     }
 
     @Override

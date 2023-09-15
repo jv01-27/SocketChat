@@ -8,14 +8,14 @@ public class ChatPeer extends Thread {
 
     private final Socket socket;
     private final JTextArea chatArea;
-    private final String usuario;
+    private final String user;
     private volatile boolean isRunning = true;
     private ChatDisconnectListener disconnectListener;
 
     public ChatPeer(Socket socket, JTextArea chatArea, String usuario) {
         this.socket = socket;
         this.chatArea = chatArea;
-        this.usuario = usuario;
+        user = usuario;
     }
 
     public void setDisconnectListener(ChatDisconnectListener listener) {
@@ -29,15 +29,15 @@ public class ChatPeer extends Thread {
             String message;
 
             while (isRunning && (message = reader.readLine()) != null) {
-                chatArea.append(usuario + ": " + message + "\n");
+                chatArea.append(user + ": " + message + "\n");
             }
         } catch (SocketException e) {
             if (!isRunning) {
                 // El socket se cerró de manera controlada (por ejemplo, cuando el usuario se desconecta)
-                System.out.println("Socket cerrado de manera controlada.");
+                System.out.println("Socket cerrado de manera controlada." + e);
             } else {
                 // El socket se cerró de manera inesperada (por ejemplo, cuando el cliente se desconecta)
-                System.err.println("Socket cerrado de manera inesperada.");
+                System.err.println("Socket cerrado de manera inesperada." + e);
                 // Notificar a la ventana principal de chat sobre la desconexión
                 if (disconnectListener != null) {
                     disconnectListener.onDisconnect();
