@@ -1,9 +1,34 @@
 package chat_socket;
 
-/**
- *
- * @author adasf
- */
+/*	
+  *
+   *
+    *
+     *
+      *
+       *
+        *
+         *
+          *
+           *
+      * * * *
+       *
+        *
+      noripan
+          *
+           *
+      * * * *
+       *
+        *
+         *
+          *
+           *
+            *
+             *
+              *
+               *
+                */
+                
 public class Chat_socket {
 
     public static void main(String[] args) {

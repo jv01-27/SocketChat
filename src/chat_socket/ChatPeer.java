@@ -1,5 +1,34 @@
 package chat_socket;
 
+/*	
+  *
+   *
+    *
+     *
+      *
+       *
+        *
+         *
+          *
+           *
+      * * * *
+       *
+        *
+      noripan
+          *
+           *
+      * * * *
+       *
+        *
+         *
+          *
+           *
+            *
+             *
+              *
+               *
+                */
+
 import java.io.*;
 import java.net.*;
 import javax.swing.JTextArea;

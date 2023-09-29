@@ -14,7 +14,7 @@ package chat_socket;
       * * * *
        *
         *
-   Nori A* Greenef
+      noripan
           *
            *
       * * * *
@@ -27,7 +27,8 @@ package chat_socket;
              *
               *
                *
- */
+                */
+
 import java.awt.Color;
 import javax.swing.JOptionPane;
 import java.io.*;

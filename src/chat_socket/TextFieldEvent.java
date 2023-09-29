@@ -1,6 +1,7 @@
 package chat_socket;
 import java.awt.event.KeyEvent;
 import javax.swing.JTextField;
+
 /*	
   *
    *
@@ -15,7 +16,7 @@ import javax.swing.JTextField;
       * * * *
        *
         *
-   Nori A* Greenef
+      noripan
           *
            *
       * * * *
@@ -29,6 +30,7 @@ import javax.swing.JTextField;
               *
                *
                 */
+                
 public class TextFieldEvent {
 
     public void textKeyPress(KeyEvent evt) {
