@@ -35,6 +35,23 @@ import java.net.*;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
+import java.util.Base64;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.crypto.BadPaddingException;
+import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.SecretKey;
+import javax.crypto.SecretKeyFactory;
+import javax.crypto.spec.DESKeySpec;
+
 public class Chat extends javax.swing.JFrame implements ChatDisconnectListener {
 
     TextFieldEvent correction = new TextFieldEvent();
@@ -57,7 +74,7 @@ public class Chat extends javax.swing.JFrame implements ChatDisconnectListener {
         }
 
         // Inicializa la variable de instancia chatPeer
-        chatPeer = new ChatPeer(socket, msj_area, "cliente");
+        chatPeer = new ChatPeer(socket, msj_area, "cliente", cipher_area);
         chatPeer.setDisconnectListener(this); // "this" se refiere a la instancia de Chat que implementa el listener
         chatPeer.start(); // Iniciar el hilo de ChatPeer
         // Configura la lógica para trabajar con el socket (enviar y recibir mensajes, etc.)
@@ -75,14 +92,14 @@ public class Chat extends javax.swing.JFrame implements ChatDisconnectListener {
         }
 
         // Inicializa la variable de instancia chatPeer
-        chatPeer = new ChatPeer(socket, msj_area, "server");
+        chatPeer = new ChatPeer(socket, msj_area, "server", cipher_area);
         chatPeer.setDisconnectListener(this); // "this" se refiere a la instancia de Chat que implementa el listener
         chatPeer.start(); // Iniciar el hilo de ChatPeer
         // Configura la lógica para trabajar con el socket (enviar y recibir mensajes, etc.)
     }
 
     @SuppressWarnings("unchecked")
-    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">                          
     private void initComponents() {
 
         supbar = new javax.swing.JPanel();
@@ -93,6 +110,10 @@ public class Chat extends javax.swing.JFrame implements ChatDisconnectListener {
         jScrollPane1 = new javax.swing.JScrollPane();
         msj_area = new javax.swing.JTextArea();
         users_area = new javax.swing.JPanel();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        cipher_area = new javax.swing.JTextArea();
+        key_in = new javax.swing.JTextField();
+        jLabel1 = new javax.swing.JLabel();
         exportConv = new javax.swing.JButton();
         logout = new javax.swing.JButton();
         importConv = new javax.swing.JButton();
@@ -101,7 +122,6 @@ public class Chat extends javax.swing.JFrame implements ChatDisconnectListener {
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("SocketChat");
         setLocationByPlatform(true);
-        setPreferredSize(new java.awt.Dimension(735, 400));
         setResizable(false);
 
         supbar.setBackground(new java.awt.Color(255, 255, 255));
@@ -166,7 +186,7 @@ public class Chat extends javax.swing.JFrame implements ChatDisconnectListener {
             chat_areaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(chat_areaLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 284, Short.MAX_VALUE)
+                .addComponent(jScrollPane1)
                 .addContainerGap())
         );
 
@@ -174,15 +194,37 @@ public class Chat extends javax.swing.JFrame implements ChatDisconnectListener {
         users_area.setPreferredSize(new java.awt.Dimension(120, 0));
         users_area.setRequestFocusEnabled(false);
 
+        cipher_area.setColumns(20);
+        cipher_area.setRows(5);
+        jScrollPane2.setViewportView(cipher_area);
+
+        key_in.setText("12345678");
+
+        jLabel1.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+        jLabel1.setText(" Llave:");
+
         javax.swing.GroupLayout users_areaLayout = new javax.swing.GroupLayout(users_area);
         users_area.setLayout(users_areaLayout);
         users_areaLayout.setHorizontalGroup(
             users_areaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 200, Short.MAX_VALUE)
+            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 200, Short.MAX_VALUE)
+            .addGroup(users_areaLayout.createSequentialGroup()
+                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(key_in))
         );
         users_areaLayout.setVerticalGroup(
             users_areaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 0, Short.MAX_VALUE)
+            .addGroup(users_areaLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 240, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(users_areaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(key_in, javax.swing.GroupLayout.DEFAULT_SIZE, 38, Short.MAX_VALUE)
+                    .addGroup(users_areaLayout.createSequentialGroup()
+                        .addGap(3, 3, 3)
+                        .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                .addContainerGap())
         );
 
         exportConv.setBackground(new java.awt.Color(201, 241, 253));
@@ -251,23 +293,79 @@ public class Chat extends javax.swing.JFrame implements ChatDisconnectListener {
         );
 
         pack();
-    }// </editor-fold>//GEN-END:initComponents
+    }// </editor-fold>                        
 
-    private void enviar_msjMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_enviar_msjMouseReleased
-        String mensaje = msj_field.getText();
-        if (!mensaje.isEmpty()) {
-            // Llama al método sendMessage() del ChatPeer para enviar el mensaje
-            chatPeer.sendMessage(mensaje);
-            msj_area.append("Tú: " + mensaje + "\n");
-            msj_field.setText("");
+    private void enviar_msjMouseReleased(java.awt.event.MouseEvent evt) {                                         
+        try {
+            // Obtener la llave ingresada por el usuario desde un campo de texto
+            String llave = key_in.getText();
+
+            SecretKeyFactory skf = SecretKeyFactory.getInstance("DES");
+            DESKeySpec kspec = new DESKeySpec(llave.getBytes());
+
+            // Generar la clave secreta utilizando la especificación de clave
+            SecretKey ks = skf.generateSecret(kspec);
+
+            // Crear un objeto Cipher para realizar operaciones de cifrado/descifrado con el algoritmo DES
+            Cipher cipher = Cipher.getInstance("DES");
+
+            // Obtener el texto a cifrar ingresado por el usuario desde un campo de texto
+            String texto = msj_field.getText();
+
+            byte[] inputBytes;
+
+            // Inicializar el cifrado en modo de cifrado y con la clave generada
+            cipher.init(Cipher.ENCRYPT_MODE, ks);
+
+            // Obtener los bytes del texto a cifrar utilizando UTF-8
+            inputBytes = texto.getBytes(StandardCharsets.UTF_8);
+
+            // Realizar la operación de cifrado y obtener los bytes cifrados
+            byte[] outputBytes = cipher.doFinal(inputBytes);
+
+            // Convertir los bytes cifrados a una representación en base64 para facilitar su transporte
+            String mensajeCifrado = Base64.getEncoder().encodeToString(outputBytes);
+
+            // Enviar el mensaje cifrado al otro usuario (a través de un objeto chatPeer)
+            if (!mensajeCifrado.isEmpty()) {
+                chatPeer.sendMessage(mensajeCifrado, llave);
+
+                // Mostrar el mensaje original (sin cifrar) en el área de mensajes del remitente
+                msj_area.append("Tú: " + texto + "\n");
+
+                // Mostrar el mensaje cifrado en un área separada (para propósitos de demostración o depuración)
+                cipher_area.append("Yo:" + mensajeCifrado + "\n");
+
+                // Limpiar el campo de texto después de enviar el mensaje
+                msj_field.setText("");
+            }
+        } catch (NoSuchAlgorithmException ex) {
+            // Manejar una excepción en caso de que no se encuentre el algoritmo especificado
+            Logger.getLogger(Chat.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (InvalidKeyException ex) {
+            // Manejar una excepción en caso de clave inválida
+            Logger.getLogger(Chat.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (InvalidKeySpecException ex) {
+            // Manejar una excepción en caso de especificación de clave inválida
+            Logger.getLogger(Chat.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (NoSuchPaddingException ex) {
+            // Manejar una excepción en caso de relleno (padding) no válido
+            Logger.getLogger(Chat.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IllegalBlockSizeException ex) {
+            // Manejar una excepción en caso de tamaño de bloque no válido
+            Logger.getLogger(Chat.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (BadPaddingException ex) {
+            // Manejar una excepción en caso de relleno (padding) incorrecto
+            Logger.getLogger(Chat.class.getName()).log(Level.SEVERE, null, ex);
         }
-    }//GEN-LAST:event_enviar_msjMouseReleased
 
-    private void logoutMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_logoutMouseClicked
+    }                                        
+
+    private void logoutMouseClicked(java.awt.event.MouseEvent evt) {                                    
         System.exit(0);
-    }//GEN-LAST:event_logoutMouseClicked
+    }                                   
 
-    private void exportConvMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_exportConvMouseClicked
+    private void exportConvMouseClicked(java.awt.event.MouseEvent evt) {                                        
         JFileChooser fileChooser = new JFileChooser();
         int seleccion = fileChooser.showSaveDialog(this);
 
@@ -294,9 +392,9 @@ public class Chat extends javax.swing.JFrame implements ChatDisconnectListener {
                 e.printStackTrace();
             }
         }
-    }//GEN-LAST:event_exportConvMouseClicked
+    }                                       
 
-    private void importConvMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_importConvMouseClicked
+    private void importConvMouseClicked(java.awt.event.MouseEvent evt) {                                        
         JFileChooser fileChooser = new JFileChooser();
         int seleccion = fileChooser.showOpenDialog(this);
 
@@ -327,7 +425,7 @@ public class Chat extends javax.swing.JFrame implements ChatDisconnectListener {
                 e.printStackTrace();
             }
         }
-    }//GEN-LAST:event_importConvMouseClicked
+    }                                       
 
     public void terCon() {
         // Detener el hilo de ChatPeer
@@ -394,18 +492,22 @@ public class Chat extends javax.swing.JFrame implements ChatDisconnectListener {
         });
     }
 
-    // Variables declaration - do not modify//GEN-BEGIN:variables
+    // Variables declaration - do not modify                     
     private javax.swing.JPanel chat_area;
+    private javax.swing.JTextArea cipher_area;
     private javax.swing.JButton enviar_msj;
     private javax.swing.JButton exportConv;
     private javax.swing.JButton importConv;
     private javax.swing.JPanel infbar;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JTextField key_in;
     private javax.swing.JLabel kind;
     private javax.swing.JButton logout;
     private javax.swing.JTextArea msj_area;
     private javax.swing.JTextField msj_field;
     private javax.swing.JPanel supbar;
     private javax.swing.JPanel users_area;
-    // End of variables declaration//GEN-END:variables
+    // End of variables declaration                   
 }
