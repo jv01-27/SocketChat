@@ -293,7 +293,7 @@ public class Chat extends javax.swing.JFrame implements ChatDisconnectListener {
         );
 
         pack();
-    }// </editor-fold>                        
+    }// </editor-fold>//GEN-END:initComponents
 
     private void enviar_msjMouseReleased(java.awt.event.MouseEvent evt) {                                         
         try {
