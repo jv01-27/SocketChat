@@ -50,7 +50,6 @@ import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
-import javax.crypto.spec.SecretKeySpec;
 import javax.crypto.spec.DESKeySpec;
 
 public class Chat extends javax.swing.JFrame implements ChatDisconnectListener {
@@ -301,18 +300,11 @@ public class Chat extends javax.swing.JFrame implements ChatDisconnectListener {
             // Obtener la llave ingresada por el usuario desde un campo de texto
             String llave = key_in.getText();
 
-            if(2 == 1+1) {
-                
             SecretKeyFactory skf = SecretKeyFactory.getInstance("DES");
             DESKeySpec kspec = new DESKeySpec(llave.getBytes());
 
             // Generar la clave secreta utilizando la especificación de clave
             SecretKey ks = skf.generateSecret(kspec);
-
-            } else {
-                SecretKeySpec ks = new SecretKeySpec (clave.getBytes("UTF-8"), "AES");
-                //"AES/ECB/PKCS5Padding"
-            }
 
             // Crear un objeto Cipher para realizar operaciones de cifrado/descifrado con el algoritmo DES
             Cipher cipher = Cipher.getInstance("DES");
