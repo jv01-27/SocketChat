@@ -35,22 +35,16 @@ import java.net.*;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 
-import java.io.BufferedReader;
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
+import java.security.*;
 import java.security.spec.InvalidKeySpecException;
 import java.util.Base64;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.crypto.BadPaddingException;
-import javax.crypto.Cipher;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.NoSuchPaddingException;
-import javax.crypto.SecretKey;
-import javax.crypto.SecretKeyFactory;
+import javax.crypto.*;
 import javax.crypto.spec.DESKeySpec;
+import javax.crypto.spec.SecretKeySpec;
+import javax.swing.ButtonGroup;
 
 public class Chat extends javax.swing.JFrame implements ChatDisconnectListener {
 
@@ -96,12 +90,13 @@ public class Chat extends javax.swing.JFrame implements ChatDisconnectListener {
         chatPeer.setDisconnectListener(this); // "this" se refiere a la instancia de Chat que implementa el listener
         chatPeer.start(); // Iniciar el hilo de ChatPeer
         // Configura la lógica para trabajar con el socket (enviar y recibir mensajes, etc.)
-    }
+    }            
 
     @SuppressWarnings("unchecked")
-    // <editor-fold defaultstate="collapsed" desc="Generated Code">                          
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        radioButtonGroup = new javax.swing.ButtonGroup();
         supbar = new javax.swing.JPanel();
         infbar = new javax.swing.JPanel();
         enviar_msj = new javax.swing.JButton();
@@ -109,11 +104,15 @@ public class Chat extends javax.swing.JFrame implements ChatDisconnectListener {
         chat_area = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         msj_area = new javax.swing.JTextArea();
+        textCip = new javax.swing.JLabel();
+        des_rb = new javax.swing.JRadioButton();
+        aes_rb = new javax.swing.JRadioButton();
+        tdes_rb = new javax.swing.JRadioButton();
         users_area = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
         cipher_area = new javax.swing.JTextArea();
         key_in = new javax.swing.JTextField();
-        jLabel1 = new javax.swing.JLabel();
+        jLabel2 = new javax.swing.JLabel();
         exportConv = new javax.swing.JButton();
         logout = new javax.swing.JButton();
         importConv = new javax.swing.JButton();
@@ -173,20 +172,64 @@ public class Chat extends javax.swing.JFrame implements ChatDisconnectListener {
         msj_area.setRows(5);
         jScrollPane1.setViewportView(msj_area);
 
+        textCip.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+        textCip.setText("Cifrado:");
+
+        radioButtonGroup.add(des_rb);
+        des_rb.setText("Cifrado DES");
+        des_rb.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                des_rbMouseClicked(evt);
+            }
+        });
+
+        radioButtonGroup.add(aes_rb);
+        aes_rb.setText("Cifrado AES");
+        aes_rb.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                aes_rbMouseClicked(evt);
+            }
+        });
+
+        radioButtonGroup.add(tdes_rb);
+        tdes_rb.setText("Cifrado 3DES");
+        tdes_rb.setToolTipText("");
+        tdes_rb.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tdes_rbMouseClicked(evt);
+            }
+        });
+
         javax.swing.GroupLayout chat_areaLayout = new javax.swing.GroupLayout(chat_area);
         chat_area.setLayout(chat_areaLayout);
         chat_areaLayout.setHorizontalGroup(
             chat_areaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(chat_areaLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 487, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 372, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(chat_areaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(textCip, javax.swing.GroupLayout.PREFERRED_SIZE, 105, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(des_rb)
+                    .addComponent(aes_rb)
+                    .addComponent(tdes_rb))
                 .addContainerGap())
         );
         chat_areaLayout.setVerticalGroup(
             chat_areaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(chat_areaLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane1)
+                .addGroup(chat_areaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 284, Short.MAX_VALUE)
+                    .addGroup(chat_areaLayout.createSequentialGroup()
+                        .addComponent(textCip, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(des_rb)
+                        .addGap(18, 18, 18)
+                        .addComponent(aes_rb)
+                        .addGap(18, 18, 18)
+                        .addComponent(tdes_rb)
+                        .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
 
@@ -200,8 +243,8 @@ public class Chat extends javax.swing.JFrame implements ChatDisconnectListener {
 
         key_in.setText("12345678");
 
-        jLabel1.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
-        jLabel1.setText(" Llave:");
+        jLabel2.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+        jLabel2.setText(" Llave:");
 
         javax.swing.GroupLayout users_areaLayout = new javax.swing.GroupLayout(users_area);
         users_area.setLayout(users_areaLayout);
@@ -209,8 +252,9 @@ public class Chat extends javax.swing.JFrame implements ChatDisconnectListener {
             users_areaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 200, Short.MAX_VALUE)
             .addGroup(users_areaLayout.createSequentialGroup()
-                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGap(6, 6, 6)
+                .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(key_in))
         );
         users_areaLayout.setVerticalGroup(
@@ -219,11 +263,9 @@ public class Chat extends javax.swing.JFrame implements ChatDisconnectListener {
                 .addContainerGap()
                 .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 240, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(users_areaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(users_areaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(key_in, javax.swing.GroupLayout.DEFAULT_SIZE, 38, Short.MAX_VALUE)
-                    .addGroup(users_areaLayout.createSequentialGroup()
-                        .addGap(3, 3, 3)
-                        .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                    .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
 
@@ -295,11 +337,36 @@ public class Chat extends javax.swing.JFrame implements ChatDisconnectListener {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void enviar_msjMouseReleased(java.awt.event.MouseEvent evt) {                                         
-        try {
-            // Obtener la llave ingresada por el usuario desde un campo de texto
-            String llave = key_in.getText();
+    private void enviar_msjMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_enviar_msjMouseReleased
+        // Obtener la llave ingresada por el usuario desde un campo de texto
+        String llave = key_in.getText();
 
+        if (des_rb.isSelected()) {
+            try {
+                validarLlave(llave, "DES", 8);
+            } catch (InvalidKeySpecException ex) {
+                Logger.getLogger(Chat.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        } else if (aes_rb.isSelected()) {
+            try {
+                validarLlave(llave, "AES", 16, 24, 32);
+            } catch (InvalidKeySpecException ex) {
+                Logger.getLogger(Chat.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        } else if (tdes_rb.isSelected()) {
+            try {
+                validarLlave(llave, "TDES", 24);
+            } catch (InvalidKeySpecException ex) {
+                Logger.getLogger(Chat.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        } else {
+            JOptionPane.showMessageDialog(null, "Selecciona un algoritmo de cifrado.");
+        }
+
+    }//GEN-LAST:event_enviar_msjMouseReleased
+
+    private String DESCipher(String llave, String textoLlano) throws InvalidKeySpecException {
+        try {
             SecretKeyFactory skf = SecretKeyFactory.getInstance("DES");
             DESKeySpec kspec = new DESKeySpec(llave.getBytes());
 
@@ -309,16 +376,13 @@ public class Chat extends javax.swing.JFrame implements ChatDisconnectListener {
             // Crear un objeto Cipher para realizar operaciones de cifrado/descifrado con el algoritmo DES
             Cipher cipher = Cipher.getInstance("DES");
 
-            // Obtener el texto a cifrar ingresado por el usuario desde un campo de texto
-            String texto = msj_field.getText();
-
             byte[] inputBytes;
 
             // Inicializar el cifrado en modo de cifrado y con la clave generada
             cipher.init(Cipher.ENCRYPT_MODE, ks);
 
             // Obtener los bytes del texto a cifrar utilizando UTF-8
-            inputBytes = texto.getBytes(StandardCharsets.UTF_8);
+            inputBytes = textoLlano.getBytes(StandardCharsets.UTF_8);
 
             // Realizar la operación de cifrado y obtener los bytes cifrados
             byte[] outputBytes = cipher.doFinal(inputBytes);
@@ -326,46 +390,111 @@ public class Chat extends javax.swing.JFrame implements ChatDisconnectListener {
             // Convertir los bytes cifrados a una representación en base64 para facilitar su transporte
             String mensajeCifrado = Base64.getEncoder().encodeToString(outputBytes);
 
-            // Enviar el mensaje cifrado al otro usuario (a través de un objeto chatPeer)
-            if (!mensajeCifrado.isEmpty()) {
-                chatPeer.sendMessage(mensajeCifrado, llave);
+            return mensajeCifrado;
+        } catch (InvalidKeyException | NoSuchAlgorithmException | InvalidKeySpecException | BadPaddingException | IllegalBlockSizeException | NoSuchPaddingException e) {
+            JOptionPane.showMessageDialog(null, "Ocurrión un error durante la operación: " + e);
 
-                // Mostrar el mensaje original (sin cifrar) en el área de mensajes del remitente
-                msj_area.append("Tú: " + texto + "\n");
+        }
+        return null;
+    }
 
-                // Mostrar el mensaje cifrado en un área separada (para propósitos de demostración o depuración)
-                cipher_area.append("Yo:" + mensajeCifrado + "\n");
+    private String AESCipher(String llave, String textoLlano) {
+        try {
+            SecretKeySpec keySpec = new SecretKeySpec(llave.getBytes(StandardCharsets.UTF_8), "AES");
 
-                // Limpiar el campo de texto después de enviar el mensaje
-                msj_field.setText("");
+            Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
+            cipher.init(Cipher.ENCRYPT_MODE, keySpec);
+
+            byte[] inputBytes = textoLlano.getBytes(StandardCharsets.UTF_8);
+            byte[] outputBytes = cipher.doFinal(inputBytes);
+
+            return Base64.getEncoder().encodeToString(outputBytes);
+        } catch (InvalidKeyException | NoSuchAlgorithmException | NoSuchPaddingException
+                | IllegalBlockSizeException | BadPaddingException e) {
+            JOptionPane.showMessageDialog(null, "Ocurrió un error durante la operación: " + e);
+        }
+        return null;
+    }
+
+    private String TDESCipher(String llave, String textoLlano) {
+        try {
+            SecretKeySpec keySpec = new SecretKeySpec(llave.getBytes(StandardCharsets.UTF_8), "DESede");
+
+            Cipher cipher = Cipher.getInstance("DESede/ECB/PKCS5Padding");
+            cipher.init(Cipher.ENCRYPT_MODE, keySpec);
+
+            byte[] inputBytes = textoLlano.getBytes(StandardCharsets.UTF_8);
+            byte[] outputBytes = cipher.doFinal(inputBytes);
+
+            return Base64.getEncoder().encodeToString(outputBytes);
+        } catch (InvalidKeyException | NoSuchAlgorithmException | NoSuchPaddingException
+                | IllegalBlockSizeException | BadPaddingException e) {
+            JOptionPane.showMessageDialog(null, "Ocurrió un error durante la operación: " + e);
+        }
+        return null;
+    }
+
+    private void validarLlave(String llaveValidable, String algoritmo, int... longitudes) throws InvalidKeySpecException {
+        boolean esValida = false;
+
+        for (int longitud : longitudes) {
+            if (llaveValidable.length() == longitud) {
+                // falta validar caracteres válidos
+                esValida = true;
+                break;
             }
-        } catch (NoSuchAlgorithmException ex) {
-            // Manejar una excepción en caso de que no se encuentre el algoritmo especificado
-            Logger.getLogger(Chat.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (InvalidKeyException ex) {
-            // Manejar una excepción en caso de clave inválida
-            Logger.getLogger(Chat.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (InvalidKeySpecException ex) {
-            // Manejar una excepción en caso de especificación de clave inválida
-            Logger.getLogger(Chat.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (NoSuchPaddingException ex) {
-            // Manejar una excepción en caso de relleno (padding) no válido
-            Logger.getLogger(Chat.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IllegalBlockSizeException ex) {
-            // Manejar una excepción en caso de tamaño de bloque no válido
-            Logger.getLogger(Chat.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (BadPaddingException ex) {
-            // Manejar una excepción en caso de relleno (padding) incorrecto
-            Logger.getLogger(Chat.class.getName()).log(Level.SEVERE, null, ex);
         }
 
-    }                                        
+        if (esValida) {
+            JOptionPane.showMessageDialog(null, "Clave es válida para " + algoritmo);
 
-    private void logoutMouseClicked(java.awt.event.MouseEvent evt) {                                    
+            // Obtener el texto a cifrar ingresado por el usuario desde un campo de texto
+            String textoLlano = msj_field.getText();
+
+            switch (algoritmo) {
+                case "DES": {
+                    String mensajeCifrado = DESCipher(llaveValidable, textoLlano);
+                    appendMessage(mensajeCifrado, llaveValidable, textoLlano, algoritmo);
+                    break;
+                }
+                case "AES": {
+                    String mensajeCifrado = AESCipher(llaveValidable, textoLlano);
+                    appendMessage(mensajeCifrado, llaveValidable, textoLlano, algoritmo);
+                    break;
+                }
+                case "TDES": {
+                    String mensajeCifrado = TDESCipher(llaveValidable, textoLlano);
+                    appendMessage(mensajeCifrado, llaveValidable, textoLlano, algoritmo);
+                    break;
+                }
+                default:
+                    break;
+            }
+
+        } else {
+            JOptionPane.showMessageDialog(null, "Clave inválida (" + algoritmo + ")");
+        }
+    }
+
+    private void appendMessage(String msgC, String llaveValida, String txtLlano, String algoritmo) {
+        // Enviar el mensaje cifrado al otro usuario (a través de un objeto chatPeer)
+        chatPeer.sendMessage(msgC, llaveValida, algoritmo);
+
+        // Mostrar el mensaje original (sin cifrar) en el área de mensajes del remitente
+        msj_area.append("Tú (" + algoritmo + "): " + txtLlano + "\n");
+
+        // Mostrar el mensaje cifrado en un área separada (para propósitos de demostración o depuración)
+        cipher_area.append("Yo (" + algoritmo + "):" + msgC + "\n");
+
+        // Limpiar el campo de texto después de enviar el mensaje
+        msj_field.setText("");
+    }
+
+    private void logoutMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_logoutMouseClicked
         System.exit(0);
-    }                                   
+    }//GEN-LAST:event_logoutMouseClicked
 
-    private void exportConvMouseClicked(java.awt.event.MouseEvent evt) {                                        
+    private void exportConvMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_exportConvMouseClicked
         JFileChooser fileChooser = new JFileChooser();
         int seleccion = fileChooser.showSaveDialog(this);
 
@@ -392,9 +521,9 @@ public class Chat extends javax.swing.JFrame implements ChatDisconnectListener {
                 e.printStackTrace();
             }
         }
-    }                                       
+    }//GEN-LAST:event_exportConvMouseClicked
 
-    private void importConvMouseClicked(java.awt.event.MouseEvent evt) {                                        
+    private void importConvMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_importConvMouseClicked
         JFileChooser fileChooser = new JFileChooser();
         int seleccion = fileChooser.showOpenDialog(this);
 
@@ -425,8 +554,37 @@ public class Chat extends javax.swing.JFrame implements ChatDisconnectListener {
                 e.printStackTrace();
             }
         }
-    }                                       
+    }//GEN-LAST:event_importConvMouseClicked
 
+    private void des_rbMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_des_rbMouseClicked
+        key_in.setText("12345678");
+    }//GEN-LAST:event_des_rbMouseClicked
+
+    private void aes_rbMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_aes_rbMouseClicked
+        key_in.setText("0123456789abcdef");
+    }//GEN-LAST:event_aes_rbMouseClicked
+
+    private void tdes_rbMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tdes_rbMouseClicked
+        key_in.setText("0123456789abcdef01234567");
+        //key_in.setText("9mng65v8jf4lxn93nabf981m");
+    }//GEN-LAST:event_tdes_rbMouseClicked
+
+    /* Extra Keys
+DES (8 bytes):
+Clave de ejemplo: 12345678
+    
+AES (16 bytes):
+Clave de ejemplo: 0123456789abcdef
+    
+AES (24 bytes):
+Clave de ejemplo: 0123456789abcdef012345
+    
+AES (32 bytes):
+Clave de ejemplo: 0123456789abcdef0123456789abcdef
+    
+3DES (24 bytes):
+Clave de ejemplo: 0123456789abcdef012345
+     */
     public void terCon() {
         // Detener el hilo de ChatPeer
         if (chatPeer != null) {
@@ -492,14 +650,16 @@ public class Chat extends javax.swing.JFrame implements ChatDisconnectListener {
         });
     }
 
-    // Variables declaration - do not modify                     
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JRadioButton aes_rb;
     private javax.swing.JPanel chat_area;
     private javax.swing.JTextArea cipher_area;
+    private javax.swing.JRadioButton des_rb;
     private javax.swing.JButton enviar_msj;
     private javax.swing.JButton exportConv;
     private javax.swing.JButton importConv;
     private javax.swing.JPanel infbar;
-    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JTextField key_in;
@@ -507,7 +667,10 @@ public class Chat extends javax.swing.JFrame implements ChatDisconnectListener {
     private javax.swing.JButton logout;
     private javax.swing.JTextArea msj_area;
     private javax.swing.JTextField msj_field;
+    private javax.swing.ButtonGroup radioButtonGroup;
     private javax.swing.JPanel supbar;
+    private javax.swing.JRadioButton tdes_rb;
+    private javax.swing.JLabel textCip;
     private javax.swing.JPanel users_area;
-    // End of variables declaration                   
+    // End of variables declaration//GEN-END:variables
 }

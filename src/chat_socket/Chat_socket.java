@@ -27,8 +27,8 @@ package chat_socket;
              *
               *
                *
-                */
-                
+                *
+ */
 public class Chat_socket {
 
     public static void main(String[] args) {

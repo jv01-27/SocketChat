@@ -27,7 +27,8 @@ package chat_socket;
              *
               *
                *
-                */
+                *
+ */
 
 import java.io.*;
 import java.net.*;
@@ -48,6 +49,8 @@ import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.DESKeySpec;
+import javax.crypto.spec.SecretKeySpec;
+import javax.swing.JOptionPane;
 
 public class ChatPeer extends Thread {
 
@@ -79,26 +82,38 @@ public class ChatPeer extends Thread {
                 // Lee el mensaje cifrado y la clave de cifrado del socket
                 String mensaje = reader.readLine();
                 String clave = reader.readLine();
+                String algoritmo = reader.readLine();
 
                 // Verifica que tanto el mensaje como la clave no sean nulos
-                if (mensaje != null && clave != null) {
-                    // Convierte la clave en bytes y genera la clave secreta
-                    SecretKeyFactory skf = SecretKeyFactory.getInstance("DES");
-                    DESKeySpec kspec = new DESKeySpec(clave.getBytes());
-                    SecretKey ks = skf.generateSecret(kspec);
+                if (mensaje != null && clave != null && algoritmo != null) {
 
-                    // Configura el cifrado con la clave secreta y modo de descifrado
-                    Cipher cipher = Cipher.getInstance("DES");
-                    cipher.init(Cipher.DECRYPT_MODE, ks);
+                    switch (algoritmo) {
+                        case "DES": {
+                            String mensajedesCifrado = DESdeCipher(clave, mensaje);
+                            // Muestra el mensaje descifrado y cifrado en las áreas de texto correspondientes
+                            chatArea.append(user + "(" + algoritmo + ")" + ": " + mensajedesCifrado + "\n");
+                            cipherArea.append(user + "(" + algoritmo + ")" + ": " + mensaje + "\n");
 
-                    // Decodifica el mensaje cifrado en bytes y lo descifra
-                    byte[] inputBytes = Base64.getDecoder().decode(mensaje);
-                    byte[] decryptedBytes = cipher.doFinal(inputBytes);
-                    String mensajeDescifrado = new String(decryptedBytes, StandardCharsets.UTF_8);
+                            break;
+                        }
+                        case "AES": {
+                            String mensajedesCifrado = AESdeCipher(clave, mensaje);
+                            // Muestra el mensaje descifrado y cifrado en las áreas de texto correspondientes
+                            chatArea.append(user + "(" + algoritmo + ")" + ": " + mensajedesCifrado + "\n");
+                            cipherArea.append(user + "(" + algoritmo + ")" + ": " + mensaje + "\n");
 
-                    // Muestra el mensaje descifrado y cifrado en las áreas de texto correspondientes
-                    chatArea.append(user + ": " + mensajeDescifrado + "\n");
-                    cipherArea.append(user + ": " + mensaje + "\n");
+                            break;
+                        }
+                        case "TDES": {
+                            String mensajedesCifrado = TDESdeCipher(clave, mensaje);
+                            // Muestra el mensaje descifrado y cifrado en las áreas de texto correspondientes
+                            chatArea.append(user + "(" + algoritmo + ")" + ": " + mensajedesCifrado + "\n");
+                            cipherArea.append(user + "(" + algoritmo + ")" + ": " + mensaje + "\n");
+                            break;
+                        }
+                        default:
+                            break;
+                    }
                 }
             }
         } catch (SocketException e) {
@@ -112,20 +127,77 @@ public class ChatPeer extends Thread {
                     disconnectListener.onDisconnect();
                 }
             }
-        } catch (IOException | NoSuchAlgorithmException | InvalidKeyException | InvalidKeySpecException | NoSuchPaddingException | IllegalBlockSizeException | BadPaddingException ex) {
+        } catch (IOException ex) {
             // Ocurrió un error relacionado con la E/S o la criptografía, imprime la traza
-            ex.printStackTrace();
+            JOptionPane.showMessageDialog(null, "Ocurrió un error durante la operación: " + ex);
         }
     }
 
-    public void sendMessage(String message, String key) {
+    public void sendMessage(String message, String key, String algoritmo) {
         try {
             PrintWriter writer = new PrintWriter(socket.getOutputStream(), true);
             writer.println(message);
             writer.println(key);
+            writer.println(algoritmo);
         } catch (IOException e) {
-            e.printStackTrace();
         }
+    }
+
+    private String DESdeCipher(String llave, String mensajeCifrado) {
+        try {
+            SecretKeyFactory skf = SecretKeyFactory.getInstance("DES");
+            DESKeySpec kspec = new DESKeySpec(llave.getBytes());
+
+            SecretKey ks = skf.generateSecret(kspec);
+
+            Cipher cipher = Cipher.getInstance("DES");
+            cipher.init(Cipher.DECRYPT_MODE, ks);
+
+            byte[] inputBytes = Base64.getDecoder().decode(mensajeCifrado);
+            byte[] outputBytes = cipher.doFinal(inputBytes);
+
+            return new String(outputBytes, StandardCharsets.UTF_8);
+        } catch (InvalidKeyException | NoSuchAlgorithmException | InvalidKeySpecException
+                | BadPaddingException | IllegalBlockSizeException | NoSuchPaddingException e) {
+            JOptionPane.showMessageDialog(null, "Ocurrió un error durante la operación: " + e);
+        }
+        return null;
+    }
+
+    private String AESdeCipher(String llave, String mensajeCifrado) {
+        try {
+            SecretKeySpec keySpec = new SecretKeySpec(llave.getBytes(StandardCharsets.UTF_8), "AES");
+
+            Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
+            cipher.init(Cipher.DECRYPT_MODE, keySpec);
+
+            byte[] inputBytes = Base64.getDecoder().decode(mensajeCifrado);
+            byte[] outputBytes = cipher.doFinal(inputBytes);
+
+            return new String(outputBytes, StandardCharsets.UTF_8);
+        } catch (InvalidKeyException | NoSuchAlgorithmException | NoSuchPaddingException
+                | IllegalBlockSizeException | BadPaddingException e) {
+            JOptionPane.showMessageDialog(null, "Ocurrió un error durante la operación: " + e);
+        }
+        return null;
+    }
+
+    private String TDESdeCipher(String llave, String mensajeCifrado) {
+        try {
+            SecretKeySpec keySpec = new SecretKeySpec(llave.getBytes(StandardCharsets.UTF_8), "DESede");
+
+            Cipher cipher = Cipher.getInstance("DESede/ECB/PKCS5Padding");
+            cipher.init(Cipher.DECRYPT_MODE, keySpec);
+
+            byte[] inputBytes = Base64.getDecoder().decode(mensajeCifrado);
+            byte[] outputBytes = cipher.doFinal(inputBytes);
+
+            return new String(outputBytes, StandardCharsets.UTF_8);
+        } catch (InvalidKeyException | NoSuchAlgorithmException | NoSuchPaddingException
+                | IllegalBlockSizeException | BadPaddingException e) {
+            JOptionPane.showMessageDialog(null, "Ocurrió un error durante la operación: " + e);
+        }
+        return null;
     }
 
     public void stopCom() {
