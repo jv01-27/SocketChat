@@ -27,8 +27,8 @@ package chat_socket;
              *
               *
                *
-                */
-                
+                *
+ */
 import java.net.ServerSocket;
 import java.io.*;
 import java.net.*;
